@@ -203,6 +203,8 @@ function stickyMenubar() {
             userWantsSticky = wants;
             hasAskedUser = true;
 
+            localStorage.setItem(STORAGE_KEY, String(wants));
+
             menubar.classList.toggle('prosemirror-menubar-fixed', wants);
         },
         {
