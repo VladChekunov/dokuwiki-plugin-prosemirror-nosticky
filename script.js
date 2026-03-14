@@ -179,18 +179,39 @@ function stickyMenubar() {
     const editorswitch = document.querySelector('button[name=prosemirror]');
     const menubar = document.querySelector('#prosemirror__editor div.menubar');
 
+    if (!editorswitch || !menubar) return;
+
+    const STORAGE_KEY = 'prosemirror-menubar-sticky';
+    let userWantsSticky  = localStorage.getItem(STORAGE_KEY) === 'true';
+    let hasAskedUser = localStorage.getItem(STORAGE_KEY) !== null;
+
     const observer = new IntersectionObserver(
         ([e]) => {
-            return menubar.classList.toggle('prosemirror-menubar-fixed', e.intersectionRatio !== 1);
+            const shouldStick = e.intersectionRatio !== 1;
+
+            if (!shouldStick) {
+                menubar.classList.remove('prosemirror-menubar-fixed');
+                return;
+            }
+            
+            if (hasAskedUser) {
+                menubar.classList.toggle('prosemirror-menubar-fixed', userWantsSticky);
+                return;
+            }
+
+            const wants = confirm("Keep editor sticky?");
+            userWantsSticky = wants;
+            hasAskedUser = true;
+
+            menubar.classList.toggle('prosemirror-menubar-fixed', wants);
         },
         {
             root: null,
             threshold: [0, 1]
         }
     );
-    if (editorswitch && menubar) {
-        observer.observe(editorswitch);
-    }
+    
+    observer.observe(editorswitch);
 }
 
 
